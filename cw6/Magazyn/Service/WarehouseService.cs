@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Magazyn.Model;
+﻿using Magazyn.Model;
 using Magazyn.Repository;
 
 namespace Magazyn.Service;
@@ -11,24 +10,27 @@ public class WarehouseService : IWarehouseService {
         _warehouseRepository = warehouseRepository;
     }
 
-    public int? PostProductWarehouse(ProductWarehouse productWarehouse) {
-        var price = _warehouseRepository.GetProduct(productWarehouse.IdProduct);
+    public async Task<int?> PostProductWarehouse(ProductWarehouse productWarehouse) {
+        var price = await _warehouseRepository.GetProduct(productWarehouse.IdProduct);
         if (price is null) {
-            //product does not exist
+            Console.WriteLine("Product does not exist!");
+            return null;
         }
 
-        if (_warehouseRepository.GetWarehouse(productWarehouse.IdWarehouse) != 1) {
-            //warehouse does not exist
+        if (await _warehouseRepository.GetWarehouse(productWarehouse.IdWarehouse) != 1) {
+            Console.WriteLine("Warehouse does not exist!");
+            return null;
         }
 
-        var idOrder = _warehouseRepository.GetOrder(productWarehouse.IdProduct, productWarehouse.Amount,
+        var idOrder = await _warehouseRepository.GetOrder(productWarehouse.IdProduct, productWarehouse.Amount,
             productWarehouse.CreatedAt);
         if (idOrder is null) {
-            //no order with given params
+            Console.WriteLine("No order found!");
+            return null;
         }
 
-        _warehouseRepository.UpdateOrder(idOrder, productWarehouse.CreatedAt);
+        await _warehouseRepository.UpdateOrder(idOrder, productWarehouse.CreatedAt);
 
-        return _warehouseRepository.InsertProductWarehouse(productWarehouse, idOrder, price);
+        return await _warehouseRepository.InsertProductWarehouse(productWarehouse, idOrder, price);
     }
 }

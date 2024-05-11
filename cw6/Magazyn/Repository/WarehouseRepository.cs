@@ -4,18 +4,13 @@ using Microsoft.Data.SqlClient;
 namespace Magazyn.Repository;
 
 public class WarehouseRepository : IWarehouseRepository {
-    private IConfiguration _configuration;
-
-    private string[] _tablesDefult = { "Doctor", "Patient" };
-
-    private readonly List<string> _tables;
+    private readonly IConfiguration _configuration;
 
     public WarehouseRepository(IConfiguration configuration) {
         _configuration = configuration;
-        _tables = new List<string>(_tablesDefult);
     }
 
-    public int? GetProduct(int id) {
+    public async Task<int?> GetProduct(int id) {
         await using var con = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
         await con.OpenAsync();
         await using var cmd = new SqlCommand();
@@ -28,7 +23,7 @@ public class WarehouseRepository : IWarehouseRepository {
         return !await dr.ReadAsync() ? null : (int)dr["Price"];
     }
 
-    public int GetWarehouse(int id) {
+    public async Task<int> GetWarehouse(int id) {
         await using var con = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
         await con.OpenAsync();
         await using var cmd = new SqlCommand();
@@ -41,7 +36,7 @@ public class WarehouseRepository : IWarehouseRepository {
         return !await dr.ReadAsync() ? 0 : 1;
     }
 
-    public int? GetOrder(int idProduct, int amount, DateTime createdAt) {
+    public async Task<int?> GetOrder(int idProduct, int amount, DateTime createdAt) {
         await using var con = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
         await con.OpenAsync();
         await using var cmd = new SqlCommand();
@@ -64,8 +59,8 @@ public class WarehouseRepository : IWarehouseRepository {
         var dr = await cmd.ExecuteReaderAsync();
         return !await dr.ReadAsync() ? null : (int)dr["o.IdOrder"];
     }
-    
-    public int UpdateOrder(int? idOrder, DateTime createdAt) {
+
+    public async Task<int> UpdateOrder(int? idOrder, DateTime createdAt) {
         await using var con = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
         await con.OpenAsync();
 
@@ -83,7 +78,7 @@ public class WarehouseRepository : IWarehouseRepository {
         return affectedCount;
     }
 
-    public int? InsertProductWarehouse(ProductWarehouse productWarehouse, int? idOrder, int? price) {
+    public async Task<int?> InsertProductWarehouse(ProductWarehouse productWarehouse, int? idOrder, int? price) {
         await using var con = new SqlConnection(_configuration["ConnectionStrings:DefaultConnection"]);
         await con.OpenAsync();
 
@@ -100,12 +95,6 @@ public class WarehouseRepository : IWarehouseRepository {
         cmd.Parameters.AddWithValue("@Price", productWarehouse.Amount * price);
         cmd.Parameters.AddWithValue("@CreatedAt", productWarehouse.CreatedAt);
         
-        //todo return idProductWarehouse
-        //todo fixme UpdateOrder and InsertProductWarehouse as one transaction?
-        //todo fixme async
-        //todo fixme maybe just run the proc(2).sql idk
-        //todo fixme throw HTML errors in WarehouseService
-
         var affectedCount = await cmd.ExecuteNonQueryAsync();
         return affectedCount;
     }

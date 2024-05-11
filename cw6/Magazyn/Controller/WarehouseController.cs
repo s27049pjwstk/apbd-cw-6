@@ -14,8 +14,8 @@ public class WarehouseController : ControllerBase {
     }
 
     [HttpPost]
-    public IActionResult tempProductWarehouse(ProductWarehouse productWarehouse) {
-        var result = _warehouseService.PostProductWarehouse(productWarehouse);
+    public async Task<IActionResult> tempProductWarehouse(ProductWarehouse productWarehouse) {
+        var result = await _warehouseService.PostProductWarehouse(productWarehouse);
         return result is null
             ? StatusCode(StatusCodes.Status400BadRequest)
             : StatusCode(StatusCodes.Status201Created);

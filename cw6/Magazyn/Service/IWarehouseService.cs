@@ -3,5 +3,5 @@
 namespace Magazyn.Service;
 
 public interface IWarehouseService {
-    int? PostProductWarehouse(ProductWarehouse productWarehouse);
+    Task<int?> PostProductWarehouse(ProductWarehouse productWarehouse);
 }

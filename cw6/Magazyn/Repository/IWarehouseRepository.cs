@@ -3,9 +3,9 @@
 namespace Magazyn.Repository;
 
 public interface IWarehouseRepository {
-    int? GetProduct(int id);
-    int GetWarehouse(int id);
-    int? GetOrder(int idProduct, int amount, DateTime createdAt);
-    int UpdateOrder(int? idOrder, DateTime createdAt);
-    int? InsertProductWarehouse(ProductWarehouse productWarehouse, int? idOrder, int? price);
+    Task<int?> GetProduct(int id);
+    Task<int> GetWarehouse(int id);
+    Task<int?> GetOrder(int idProduct, int amount, DateTime createdAt);
+    Task<int> UpdateOrder(int? idOrder, DateTime createdAt);
+    Task<int?> InsertProductWarehouse(ProductWarehouse productWarehouse, int? idOrder, int? price);
 }
